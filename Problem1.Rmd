@@ -1,0 +1,87 @@
+
+```{r}
+# Import libraries
+library(ggplot2)
+library(sf)
+library(spdep)
+library(Matrix)
+```
+
+```{r}
+# Load data
+Admin1Graph <- read.table("Admin1Graph.txt")
+Admin2Graph <- read.table("Admin2Graph.txt")
+Admin1Geography <- load("Admin1Geography.RData")
+Admin2Geography <- load("Admin2Geography.RData")
+DirectEstimates <- read.table("DirectEstimates.txt")
+```
+
+
+PROBLEM 1
+a)
+
+Implement matrices 
+```{r}
+N_1 <- as.matrix(Admin1Graph)
+N_2 <- as.matrix(Admin2Graph)
+```
+
+Compute the Precision matrices
+```{r}
+# Create R from N
+R_1 <- -N_1  # Set off-diagonal to -1 where N_ij is 1
+R_2 <- -N_2
+diag(R_1) <- rowSums(N_1)  # Set diagonal entries to the number of neighbors
+diag(R_2) <- rowSums(N_2)
+
+# Define the precision parameter, t (example: t = 1)
+tau_1 <- 1
+tau_2 <- 1
+
+# Compute Q
+Q_1 <- tau_1 * R_1
+Q_2 <- tau_2 * R_2
+
+n1 = dim(Q_1)
+n2 = dim(Q_2)
+```
+
+Computing rank and determining symmetry
+```{r}
+check_Rank_and_Symmetry <- function(q, admin_nr){
+  cat("admin ", admin_nr,": \n")
+  if (!(isSymmetric(q))) {
+    stop("Q not symmetric")
+  }
+  cat("dim(Q) = ", dim(q),"\n")
+  cat("rank(Q) = ", rankMatrix(q)$rank,"\n")
+}
+check_Rank_and_Symmetry(Q_1, 1)
+cat("\n")
+check_Rank_and_Symmetry(Q_2, 2)
+```
+
+Compute the proportion of non-zero elements and display the sparsity pattern
+```{r}
+number_of_zeros_1 <- sum(Q_1 == 0)
+number_of_zeros_2 = sum(Q_2 == 0)
+cat("number of zero elements Q_1: ", number_of_zeros_1, "\n")
+cat("number of zero elements Q_2: ", number_of_zeros_2)
+
+# Plotting the sparsity pattern
+image(1:n1, 1:n1, Q_1 != 0, col = c("black", "cyan"), axes = TRUE, xlab = "col", ylab = "row")
+image(1:n2, 1:n2, Q_2 != 0, col = c("black", "cyan"), axes = TRUE, xlab = "col", ylab = "row")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
