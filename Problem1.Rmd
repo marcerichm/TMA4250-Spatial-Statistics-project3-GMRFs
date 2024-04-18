@@ -126,7 +126,7 @@ Initialize Besag model simulator
 simulator.besag = function(mu, Q_stable, epsilon){
   n = nrow(Q_stable)
   L = chol(Q_stable)
-  z = mvrnorm(n = n, mu, diag(n))
+  z = rnorm(n)
   x = solve(L, z)
   x_star = x - mean(x) * rep(1, length(x))
   return(x_star)
@@ -151,18 +151,46 @@ admin1_stdnorm_simulation_2 = rnorm(nrow(Q_stable_1))
 
 Plot simulations
 ```{r}
-plotAreaCol(fName = "admin1_besag_simulation_1.jpg", estVal = admin1_besag_simulation_1, geoMap = Admin1Geography, leg = "values", colLim = c(-5,5))
-plotAreaCol(fName = "admin1_besag_simulation_2.jpg", estVal = admin1_besag_simulation_2, geoMap = Admin1Geography, leg = "values", colLim = c(-5,5))
-plotAreaCol(fName = "admin1_stdnorm_simulation_1.jpg", estVal = admin1_stdnorm_simulation_1, geoMap = Admin1Geography, leg = "values", colLim = c(-5,5))
-plotAreaCol(fName = "admin1_stdnorm_simulation_2.jpg", estVal = admin1_stdnorm_simulation_2, geoMap = Admin1Geography, leg = "values", colLim = c(-5,5))
+plotAreaCol(fName = "admin1_besag_simulation_1.png", width = 15, height = 15, estVal = admin1_besag_simulation_1, geoMap = nigeriaAdm1, leg = "", colLim = c(-3,3))
+plotAreaCol(fName = "admin1_besag_simulation_2.png", width = 15, height = 15, estVal = admin1_besag_simulation_2, geoMap = nigeriaAdm1, leg = "", colLim = c(-3,3))
+plotAreaCol(fName = "admin1_stdnorm_simulation_1.png", width = 15, height = 15, estVal = admin1_stdnorm_simulation_1, geoMap = nigeriaAdm1, leg = "", colLim = c(-3,3))
+plotAreaCol(fName = "admin1_stdnorm_simulation_2.png", width = 15, height = 15, estVal = admin1_stdnorm_simulation_2, geoMap = nigeriaAdm1, leg = "", colLim = c(-3,3))
 ```
 
 
 
+c) 
+
+create simulations
+```{r}
+# parameters
+epsilon_2 <- 0.001
+Q_stable_2 = Q_2 + epsilon_2 * diag(nrow(Q_2))
+mu_2 <- rep(0, nrow(Q_stable_2))
+
+# Besag simulations
+admin2_besag_simulation_1 = simulator.besag(mu_2, Q_stable_2, epsilon_2)
+admin2_besag_simulation_2 = simulator.besag(mu_2, Q_stable_2, epsilon_2)
+
+# N_37(0, I) simulations
+admin2_stdnorm_simulation_1 = rnorm(nrow(Q_stable_2))
+admin2_stdnorm_simulation_2 = rnorm(nrow(Q_stable_2))
+```
+
+Plot simulations
+```{r}
+plotAreaCol(fName = "admin2_besag_simulation_1.png", width = 15, height = 15, estVal = admin2_besag_simulation_1, geoMap = nigeriaAdm2, leg = "", colLim = c(-3,3))
+plotAreaCol(fName = "admin2_besag_simulation_2.png", width = 15, height = 15, estVal = admin2_besag_simulation_2, geoMap = nigeriaAdm2, leg = "", colLim = c(-3,3))
+plotAreaCol(fName = "admin2_stdnorm_simulation_1.png", width = 15, height = 15, estVal = admin2_stdnorm_simulation_1, geoMap = nigeriaAdm2, leg = "", colLim = c(-3,3))
+plotAreaCol(fName = "admin2_stdnorm_simulation_2.png", width = 15, height = 15, estVal = admin2_stdnorm_simulation_2, geoMap = nigeriaAdm2, leg = "", colLim = c(-3,3))
+```
 
 
 
+d) 
 
+```{r}
 
+```
 
 
