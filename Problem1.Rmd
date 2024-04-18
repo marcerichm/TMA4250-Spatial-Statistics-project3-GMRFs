@@ -123,7 +123,7 @@ b)
 Initialize Besag model simulator
 ```{r}
 # sampler function
-simulator.besag = function(mu, Q_stable, epsilon){
+simulator.besag = function(mu, Q_stable, epsilon = 0.001){
   n = nrow(Q_stable)
   L = chol(Q_stable)
   z = rnorm(n)
@@ -135,6 +135,7 @@ simulator.besag = function(mu, Q_stable, epsilon){
 
 create simulations
 ```{r}
+set.seed(123)
 # parameters
 epsilon_1 <- 0.001
 Q_stable_1 = Q_1 + epsilon_1 * diag(nrow(Q_1))
@@ -163,6 +164,8 @@ c)
 
 create simulations
 ```{r}
+set.seed(123)
+
 # parameters
 epsilon_2 <- 0.001
 Q_stable_2 = Q_2 + epsilon_2 * diag(nrow(Q_2))
@@ -189,8 +192,28 @@ plotAreaCol(fName = "admin2_stdnorm_simulation_2.png", width = 15, height = 15, 
 
 d) 
 
+Implement variance sampler
 ```{r}
-
+simulate.besag.variance <- function(n_samples, Q, area_number, mu = 0, epsilon = 0.001){
+  samples = matrix(0, nrow = n_samples, ncol = ncol(Q))
+  for (i in 1:n_samples){
+    samples[i,] = simulator.besag(mu, Q, epsilon)
+  }
+  variances_vec = apply(samples, 2, var)
+  correlation_vec <- cor(samples[, area_number], samples)
+  return(list("variances"=variances_vec, "correlation"=c(correlation_vec)))
+}
 ```
 
+compute simulations
+```{r}
+set.seed(123)
+admin2_besag_VC_simulation = simulate.besag.variance(100, Q = Q_stable_2, area_number = 150, mu = 0, epsilon = 0.001)
+```
 
+Plot simulations
+```{r}
+plotAreaCol(fName = "admin2_besag_var_simulation.png", width = 15, height = 15, estVal = admin2_besag_VC_simulation$variances, geoMap = nigeriaAdm2, leg = "var", colLim = c(0,1))
+plotAreaCol(fName = "admin2_besag_corr_simulation.png", width = 15, height = 15, estVal = admin2_besag_VC_simulation$correlation, geoMap = nigeriaAdm2, leg = "corr", colLim = c(-1,1))
+
+```
