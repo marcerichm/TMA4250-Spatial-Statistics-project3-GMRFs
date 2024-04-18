@@ -5,15 +5,57 @@ library(ggplot2)
 library(sf)
 library(spdep)
 library(Matrix)
+library(MASS)
 ```
 
 ```{r}
 # Load data
 Admin1Graph <- read.table("Admin1Graph.txt")
 Admin2Graph <- read.table("Admin2Graph.txt")
-Admin1Geography <- load("Admin1Geography.RData")
-Admin2Geography <- load("Admin2Geography.RData")
+load("Admin1Geography.RData")
+load("Admin2Geography.RData")
 DirectEstimates <- read.table("DirectEstimates.txt")
+```
+
+```{r}
+## plotAreaCol
+# This functions plots the values and saves the figure to the specified file.
+# It is advisable to not plot directly in R since it will take a long time.
+# The arguments are:
+#   fNamme: file name for saving figure
+#   width: width of figure in inches
+#   height: height of figure in inches
+#   estVal: the k values to be plotted on geoMap
+#   geoMap: the map containing k regions
+#   leg: name to use on top of legend
+#   colLim: control lower limit and upper limit of color scale (colLim = c(lowVal, highVal))
+plotAreaCol = function(fName, width, height, estVal, geoMap, leg, colLim = NULL){
+  if(is.null(colLim)){
+    colLim = range(estVal)
+  }
+  
+  # Set up data object for plotting
+  nigeriaMapTmp = geoMap
+  nigeriaMapTmp$MCV1 = estVal
+  
+  # Plot
+  map = ggplot() +
+    geom_sf(data = nigeriaMapTmp,
+            aes(fill = MCV1),
+            color = 'gray', size = .2)+
+    scale_fill_viridis_c(direction = 1,
+                         begin = 1,
+                         end = 0,
+                         limit = colLim,
+                         name = leg) + 
+    theme(text = element_text(size=40),
+          legend.key.height = unit(4, 'cm'),
+          legend.key.width  = unit(1.75, 'cm'))
+  ggsave(filename = fName,
+         plot = map,
+         width = width, 
+         height = height)
+}
 ```
 
 
@@ -75,6 +117,45 @@ image(1:n2, 1:n2, Q_2 != 0, col = c("black", "cyan"), axes = TRUE, xlab = "col",
 ```
 
 
+
+b) 
+
+Initialize Besag model simulator
+```{r}
+# sampler function
+simulator.besag = function(mu, Q_stable, epsilon){
+  n = nrow(Q_stable)
+  L = chol(Q_stable)
+  z = mvrnorm(n = n, mu, diag(n))
+  x = solve(L, z)
+  x_star = x - mean(x) * rep(1, length(x))
+  return(x_star)
+}
+```
+
+create simulations
+```{r}
+# parameters
+epsilon_1 <- 0.001
+Q_stable_1 = Q_1 + epsilon_1 * diag(nrow(Q_1))
+mu_1 <- rep(0, nrow(Q_stable_1))
+
+# Besag simulations
+admin1_besag_simulation_1 = simulator.besag(mu_1, Q_stable_1, epsilon_1)
+admin1_besag_simulation_2 = simulator.besag(mu_1, Q_stable_1, epsilon_1)
+
+# N_37(0, I) simulations
+admin1_stdnorm_simulation_1 = rnorm(nrow(Q_stable_1))
+admin1_stdnorm_simulation_2 = rnorm(nrow(Q_stable_1))
+```
+
+Plot simulations
+```{r}
+plotAreaCol(fName = "admin1_besag_simulation_1.jpg", estVal = admin1_besag_simulation_1, geoMap = Admin1Geography, leg = "values", colLim = c(-5,5))
+plotAreaCol(fName = "admin1_besag_simulation_2.jpg", estVal = admin1_besag_simulation_2, geoMap = Admin1Geography, leg = "values", colLim = c(-5,5))
+plotAreaCol(fName = "admin1_stdnorm_simulation_1.jpg", estVal = admin1_stdnorm_simulation_1, geoMap = Admin1Geography, leg = "values", colLim = c(-5,5))
+plotAreaCol(fName = "admin1_stdnorm_simulation_2.jpg", estVal = admin1_stdnorm_simulation_2, geoMap = Admin1Geography, leg = "values", colLim = c(-5,5))
+```
 
 
 
