@@ -220,3 +220,53 @@ plotAreaCol(fName = "admin2_besag_var_simulation.jpeg", width = 15, height = 11,
 plotAreaCol(fName = "admin2_besag_corr_simulation.jpeg", width = 15, height = 11, estVal = admin2_besag_VC_simulation$correlation, geoMap = nigeriaAdm2, leg = "corr", colLim = c(-1,1))
 
 ```
+
+
+
+
+-----PROBLEM 2------
+
+a) 
+
+Get data vectors
+```{r}
+expit = function(x){exp(x)/(1 + exp(x))}
+
+
+DirectEstimates_admin1 = DirectEstimates$V1[2:length(DirectEstimates$V1)]
+DirectEstimates_obs = expit(as.numeric(DirectEstimates$V2[2:length(DirectEstimates$V2)]))
+DirectEstimates_stdDev = as.numeric(DirectEstimates$V3[2:length(DirectEstimates$V3)])
+```
+
+Plot observed proportions
+```{r}
+plotAreaCol(fName = "DirectEstimation_obs.jpeg", width = 15, height = 11, estVal = DirectEstimates_obs, geoMap = nigeriaAdm1, leg = "", colLim = c(0,1))
+```
+
+
+b) 
+
+construct V and define function that samples from N(y, V^-1) and calculates median + coefficient of variation
+```{r}
+V = DirectEstimates_stdDev * diag(nrow = length(DirectEstimates_stdDev))
+V_inv = solve(V)
+sample.normal <- function(mu, V){
+  
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
