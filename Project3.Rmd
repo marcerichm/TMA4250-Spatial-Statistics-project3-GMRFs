@@ -62,8 +62,9 @@ plotAreaCol = function(fName, width, height, estVal, geoMap, leg, colLim = NULL)
 ```
 
 
-PROBLEM 1
-a)
+----------PROBLEM 1----------
+
+a) ----------
 
 Implement matrices 
 ```{r}
@@ -121,7 +122,7 @@ image(1:n2, 1:n2, Q_2 != 0, col = c("black", "cyan"), axes = TRUE, xlab = "col",
 
 
 
-b) 
+b) ----------
 
 Initialize Besag model simulator
 ```{r}
@@ -163,7 +164,7 @@ plotAreaCol(fName = "admin1_stdnorm_simulation_2.jpeg", width = 15, height = 11,
 
 
 
-c) 
+c) ----------
 
 create simulations
 ```{r}
@@ -193,7 +194,7 @@ plotAreaCol(fName = "admin2_stdnorm_simulation_2.jpeg", width = 15, height = 11,
 
 
 
-d) 
+d) ----------
 
 Implement variance sampler
 ```{r}
@@ -231,30 +232,55 @@ a)
 Get data vectors
 ```{r}
 expit = function(x){exp(x)/(1 + exp(x))}
-
+logit = function(p){log(p/(1-p))}
 
 DirectEstimates_admin1 = DirectEstimates$V1[2:length(DirectEstimates$V1)]
-DirectEstimates_obs = expit(as.numeric(DirectEstimates$V2[2:length(DirectEstimates$V2)]))
+DirectEstimates_obs = as.numeric(DirectEstimates$V2[2:length(DirectEstimates$V2)])
 DirectEstimates_stdDev = as.numeric(DirectEstimates$V3[2:length(DirectEstimates$V3)])
 ```
 
 Plot observed proportions
 ```{r}
-plotAreaCol(fName = "DirectEstimation_obs.jpeg", width = 15, height = 11, estVal = DirectEstimates_obs, geoMap = nigeriaAdm1, leg = "", colLim = c(0,1))
+plotAreaCol(fName = "DirectEstimation_obs.jpeg", width = 15, height = 11, estVal = expit(DirectEstimates_obs), geoMap = nigeriaAdm1, leg = "", colLim = c(0,1))
 ```
 
 
-b) 
+b) ---------
 
 construct V and define function that samples from N(y, V^-1) and calculates median + coefficient of variation
 ```{r}
+sigma = 100
+
+# compute new cov matrix for X|Y
 V = DirectEstimates_stdDev * diag(nrow = length(DirectEstimates_stdDev))
-V_inv = solve(V)
-sample.normal <- function(mu, V){
-  
-}
+W = matrix(0, nrow = nrow(V), ncol = ncol(V))
+for (i in 1:nrow(V)){W[i,i] = sigma**2/(sigma**2 + V[i,i])}
+X_cond_Y_cov = W %*% V
+
+# Compute new mean
+X_cond_Y_mean = W %*% DirectEstimates_obs
 ```
 
+sample values
+```{r}
+set.seed(123)
+#samples.2b = sample.normal(100)
+samples.2b = expit(mvrnorm(n = 100, mu = X_cond_Y_mean, Sigma = X_cond_Y_cov))
+median.2b = apply(samples.2b, MARGIN = 2, median)
+mean.2b = apply(samples.2b, MARGIN = 2, mean)
+stdev.2b = sqrt(apply(samples.2b, MARGIN = 2, var))
+cv.2b = stdev.2b/mean.2b
+```
+
+plot
+```{r}
+plotAreaCol(fName = "admin1_median_2b.jpeg", width = 15, height = 11, estVal = median.2b, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
+plotAreaCol(fName = "admin1_cv_2b.jpeg", width = 15, height = 11, estVal = cv.2b, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.5))
+```
+
+
+
+c) ----------
 
 
 
