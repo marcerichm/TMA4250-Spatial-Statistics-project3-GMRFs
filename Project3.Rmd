@@ -282,8 +282,33 @@ plotAreaCol(fName = "admin1_cv_2b.jpeg", width = 15, height = 11, estVal = cv.2b
 
 c) ----------
 
+compute new mu and precision matrix
+```{r}
+# Compute new mean
+mu_2c = solve(Q_1 + V) %*% (V %*% DirectEstimates_obs)
+precision_2c = solve(Q_1 + V)
+``` 
 
+sample values
+```{r}
+set.seed(123)
+#samples.2b = sample.normal(100)
+samples.2c = expit(mvrnorm(n = 100, mu = mu_2c, Sigma = precision_2c))
+median.2c = apply(samples.2c, MARGIN = 2, median)
+mean.2c = apply(samples.2c, MARGIN = 2, mean)
+stdev.2c = sqrt(apply(samples.2c, MARGIN = 2, var))
+cv.2c = stdev.2c/mean.2c
+median_diff = mean.2c - mean.2b
+cv_diff = cv.2c - cv.2b
+```
 
+plot
+```{r}
+plotAreaCol(fName = "admin1_median_2c.jpeg", width = 15, height = 11, estVal = median.2b, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
+plotAreaCol(fName = "admin1_cv_2c.jpeg", width = 15, height = 11, estVal = cv.2b, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.5))
+plotAreaCol(fName = "admin1_median_diff_2c.jpeg", width = 15, height = 11, estVal = median_diff, geoMap = nigeriaAdm1, leg = "diff", colLim = c(-1,1))
+plotAreaCol(fName = "admin1_cv_diff_2c.jpeg", width = 15, height = 11, estVal = cv_diff, geoMap = nigeriaAdm1, leg = "diff", colLim = c(-0.5,0.5))
+```
 
 
 
