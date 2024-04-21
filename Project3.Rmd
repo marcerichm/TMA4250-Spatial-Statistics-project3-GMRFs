@@ -402,13 +402,13 @@ cv.2e_3 = sqrt(apply(samples.2e_3, MARGIN = 2, var))/apply(samples.2e_3, MARGIN 
 plot
 ```{r}
 plotAreaCol(fName = "admin1_median_2e_1.jpeg", width = 15, height = 11, estVal = median.2e_1, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
-plotAreaCol(fName = "admin1_cv_2e_1.jpeg", width = 15, height = 11, estVal = cv.2e_1, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.9))
+plotAreaCol(fName = "admin1_cv_2e_1.jpeg", width = 15, height = 11, estVal = cv.2e_1, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,1))
 
 plotAreaCol(fName = "admin1_median_2e_2.jpeg", width = 15, height = 11, estVal = median.2e_2, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
-plotAreaCol(fName = "admin1_cv_2e_2.jpeg", width = 15, height = 11, estVal = cv.2e_2, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.5))
+plotAreaCol(fName = "admin1_cv_2e_2.jpeg", width = 15, height = 11, estVal = cv.2e_2, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,1))
 
 plotAreaCol(fName = "admin1_median_2e_3.jpeg", width = 15, height = 11, estVal = median.2e_3, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
-plotAreaCol(fName = "admin1_cv_2e_3.jpeg", width = 15, height = 11, estVal = cv.2e_3, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.5))
+plotAreaCol(fName = "admin1_cv_2e_3.jpeg", width = 15, height = 11, estVal = cv.2e_3, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,1))
 ```
 
 
