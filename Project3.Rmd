@@ -81,12 +81,12 @@ diag(R_1) <- rowSums(N_1)  # Set diagonal entries to the number of neighbors
 diag(R_2) <- rowSums(N_2)
 
 # Define the precision parameter, t (example: t = 1)
-tau_1 <- 1
-tau_2 <- 1
+tau1 <- 1
+tau2 <- 1
 
 # Compute Q
-Q_1 <- tau_1 * R_1
-Q_2 <- tau_2 * R_2
+Q_1 <- tau1 * R_1
+Q_2 <- tau2 * R_2
 
 n1 = dim(Q_1)
 n2 = dim(Q_2)
@@ -292,7 +292,7 @@ precision_2c = solve(Q_1 + V)
 sample values
 ```{r}
 set.seed(123)
-#samples.2b = sample.normal(100)
+
 samples.2c = expit(mvrnorm(n = 100, mu = mu_2c, Sigma = precision_2c))
 median.2c = apply(samples.2c, MARGIN = 2, median)
 mean.2c = apply(samples.2c, MARGIN = 2, mean)
@@ -312,12 +312,158 @@ plotAreaCol(fName = "admin1_cv_diff_2c.jpeg", width = 15, height = 11, estVal = 
 
 
 
+d) ----------
+
+Params
+```{r}
+y_38 = 0.5 
+v_38 = 0.1
+``` 
+
+compute new mu and covariance matrix
+```{r}
+# compute new V
+V_tilde = matrix(0, 38, 38)
+V_tilde[1:37, 1:37] = V
+V_tilde[38, 38] = v_38  
+
+# computing M
+M = matrix(0, nrow = 38, ncol = 37)
+M[1:37, 1:37] = diag(37)
+M[38,20] = 1
+
+# computing y_tilde
+y_tilde = c(DirectEstimates_obs, y_38)
+
+
+# Compute new mean and cov
+mu_2d = solve(Q_1 + t(M) %*% solve(V_tilde) %*% M) %*% (t(M) %*% solve(V_tilde) %*% y_tilde)
+cov_2d = solve(Q_1 + t(M) %*% solve(V_tilde) %*% M)
+``` 
+
+sample values
+```{r}
+set.seed(123)
+
+samples.2d = expit(mvrnorm(n = 100, mu = mu_2d, Sigma = cov_2d))
+median.2d = apply(samples.2d, MARGIN = 2, median)
+mean.2d = apply(samples.2d, MARGIN = 2, mean)
+stdev.2d = sqrt(apply(samples.2d, MARGIN = 2, var))
+cv.2d = stdev.2d/mean.2d
+#median_diff = mean.2d - mean.2b
+#cv_diff = cv.2d - cv.2b
+```
+
+plot
+```{r}
+plotAreaCol(fName = "admin1_median_2d.jpeg", width = 15, height = 11, estVal = median.2d, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
+plotAreaCol(fName = "admin1_cv_2d.jpeg", width = 15, height = 11, estVal = cv.2d, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.5))
+#plotAreaCol(fName = "admin1_median_diff_2d.jpeg", width = 15, height = 11, estVal = median_diff, geoMap = nigeriaAdm1, leg = "diff", colLim = c(-1,1))
+#plotAreaCol(fName = "admin1_cv_diff_2d.jpeg", width = 15, height = 11, estVal = cv_diff, geoMap = nigeriaAdm1, leg = "diff", colLim = c(-0.5,0.5))
+```
 
 
 
+e) ----------
+
+compute new mu and precision matrix
+```{r}
+tau_1 = 0.1 
+tau_2 = 1
+tau_3 = 10
+# Compute new mean
+mu_2e_1 = solve(tau_1*R_1 + V) %*% (V %*% DirectEstimates_obs)
+mu_2e_2 = solve(tau_2*R_1 + V) %*% (V %*% DirectEstimates_obs)
+mu_2e_3 = solve(tau_3*R_1 + V) %*% (V %*% DirectEstimates_obs)
+cov_2e_1 = solve(tau_1*R_1 + V)
+cov_2e_2 = solve(tau_2*R_1 + V)
+cov_2e_3 = solve(tau_3*R_1 + V)
+``` 
+
+sample values
+```{r}
+set.seed(123)
+
+samples.2e_1 = expit(mvrnorm(n = 100, mu = mu_2e_1, Sigma = cov_2e_1))
+samples.2e_2 = expit(mvrnorm(n = 100, mu = mu_2e_2, Sigma = cov_2e_2))
+samples.2e_3 = expit(mvrnorm(n = 100, mu = mu_2e_3, Sigma = cov_2e_3))
+
+
+median.2e_1 = apply(samples.2e_1, MARGIN = 2, median)
+cv.2e_1 = sqrt(apply(samples.2e_1, MARGIN = 2, var))/apply(samples.2e_1, MARGIN = 2, mean)
+
+median.2e_2 = apply(samples.2e_2, MARGIN = 2, median)
+cv.2e_2 = sqrt(apply(samples.2e_2, MARGIN = 2, var))/apply(samples.2e_2, MARGIN = 2, mean)
+
+median.2e_3 = apply(samples.2e_3, MARGIN = 2, median)
+cv.2e_3 = sqrt(apply(samples.2e_3, MARGIN = 2, var))/apply(samples.2e_3, MARGIN = 2, mean)
+```
+
+plot
+```{r}
+plotAreaCol(fName = "admin1_median_2e_1.jpeg", width = 15, height = 11, estVal = median.2e_1, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
+plotAreaCol(fName = "admin1_cv_2e_1.jpeg", width = 15, height = 11, estVal = cv.2e_1, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.9))
+
+plotAreaCol(fName = "admin1_median_2e_2.jpeg", width = 15, height = 11, estVal = median.2e_2, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
+plotAreaCol(fName = "admin1_cv_2e_2.jpeg", width = 15, height = 11, estVal = cv.2e_2, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.5))
+
+plotAreaCol(fName = "admin1_median_2e_3.jpeg", width = 15, height = 11, estVal = median.2e_3, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
+plotAreaCol(fName = "admin1_cv_2e_3.jpeg", width = 15, height = 11, estVal = cv.2e_3, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.5))
+```
 
 
 
+f) ----------
 
+Create log likelihood for tau
+```{r}
+x_opt = expit(mvrnorm(1, mu = solve(R_1 + solve(V)) %*% (solve(V) %*% DirectEstimates_obs), Sigma = solve(R_1 + solve(V))))
 
+optimize_tau = function(tau){
+  
+  mu_c = solve(tau*R_1 + solve(V)) %*% (solve(V) %*% DirectEstimates_obs)
+  Q_c = tau*R_1 + solve(V)
+  D = V
+  y = DirectEstimates_obs
+  x = x_opt
+  
+  a = (36/2)*log(tau)
+  b = (tau/2)* (t(x) %*% R_1 %*% x)
+  c = 0.5 * t(y - x) %*% solve(D) %*% (y - x)
+  d = 0.5 * log(det(Q_c))
+  e = 0.5 * t(x - mu_c) %*% Q_c %*% (x - mu_c)
+  return(a - b - c - d + e)
+}
+vals = c()
+for (i in 0:100){
+  vals = c(vals, optimize_tau(i))
+}
 
+plot(0:100, vals, type = "l")
+``` 
+
+sample values
+```{r}
+set.seed(123)
+
+tau_opt = optimize(optimize_tau, interval = c(0,10), maximum = TRUE)$maximum
+
+mu_opt = solve(tau_opt*R_1 + solve(V)) %*% (solve(V) %*% DirectEstimates_obs)
+Q_opt = tau_opt*R_1 + solve(V)
+
+samples.2f = expit(mvrnorm(n = 100, mu = mu_opt, Sigma = solve(Q_opt)))
+
+median.2f = apply(samples.2f, MARGIN = 2, median)
+cv.2f = sqrt(apply(samples.2f, MARGIN = 2, var))/apply(samples.2e_1, MARGIN = 2, mean)
+```
+
+tau
+```{r}
+tau_opt
+```
+
+plot
+```{r}
+plotAreaCol(fName = "admin1_median_2f.jpeg", width = 15, height = 11, estVal = median.2f, geoMap = nigeriaAdm1, leg = "median", colLim = c(0,1))
+plotAreaCol(fName = "admin1_cv_2f.jpeg", width = 15, height = 11, estVal = cv.2f, geoMap = nigeriaAdm1, leg = "CV", colLim = c(0,0.9))
+```
